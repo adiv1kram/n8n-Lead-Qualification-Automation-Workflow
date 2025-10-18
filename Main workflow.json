@@ -1,0 +1,796 @@
+{
+  "name": "Main workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": []
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        16
+      ],
+      "id": "bf4a1f2e-302f-4e06-9971-ce3cf7c83f2c",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PHxC2DbsPoWVx7UW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "Lead-Test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -368,
+        -176
+      ],
+      "id": "845dd25b-51bb-4beb-8084-d766f51b1246",
+      "name": "Webhook",
+      "webhookId": "e9c5b70a-33ed-4a23-ae06-c66f71478a0c"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -96,
+        -96
+      ],
+      "id": "f34e41ba-9492-419b-878a-94e01aa13b0a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21b9e375-12ca-4639-8f84-dd7693635432",
+              "name": "lead_name",
+              "value": "={{ $json.query.name }}",
+              "type": "string"
+            },
+            {
+              "id": "de8e1c57-97fe-433b-bd78-33d3273be326",
+              "name": "lead_email",
+              "value": "={{ $json.query.email }}",
+              "type": "string"
+            },
+            {
+              "id": "49275907-6087-4ba7-a111-5a5757285933",
+              "name": "lead_company",
+              "value": "={{ $json.query.company }}",
+              "type": "string"
+            },
+            {
+              "id": "c45ad03e-5a8e-4727-90b2-47518d5e164a",
+              "name": "lead_message",
+              "value": "={{ $json.query.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        112
+      ],
+      "id": "3b8056e7-4b01-4727-b2aa-f39f84b7e56e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fcf5ab33-7f03-4e9f-962a-c6a8409affbe",
+              "leftValue": "={{ $json.data1.category }}",
+              "rightValue": "High Intent",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        112
+      ],
+      "id": "80bcf7d8-0d23-4cbf-88f0-d0fe0e177915",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "80d1bbc6-b0d8-4d85-b9a4-527a11123410",
+              "name": "data1",
+              "value": "{   \"category\": \"Medium Intent\",   \"confidence\": 0.85 }",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        272
+      ],
+      "id": "485e7790-c629-4e64-a5d2-470018b1fc5e",
+      "name": "Mock Subflow Output"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1fzjk1r9zfHkQKvLORtqOqbReVxzcg6_tivadHZM8o8M",
+          "mode": "list",
+          "cachedResultName": "CRM SHEET",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fzjk1r9zfHkQKvLORtqOqbReVxzcg6_tivadHZM8o8M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fzjk1r9zfHkQKvLORtqOqbReVxzcg6_tivadHZM8o8M/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.lead_name }}",
+            "Email": "={{ $json.lead_email }}",
+            "Company": "={{ $json.lead_company }}",
+            "Message": "={{ $json.lead_message }}",
+            "Category": "={{ $json.data.category }}",
+            "Confidence": "={{ $json.data.confidence }}"
+          },
+          "matchingColumns": [
+            "Confidence"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confidence",
+              "displayName": "Confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        720,
+        -80
+      ],
+      "id": "d7cbeadb-6284-4ed8-b9e5-e05a4f95622e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "v7VXnKnD6PI4anrv",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        128
+      ],
+      "id": "092c53e6-f719-4c26-8c0f-5e0930a1c025",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1833609f-d910-407d-a48e-4acd4ac1bf3f",
+              "leftValue": "={{ $json.data1.category }}",
+              "rightValue": "Medium Intent",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        128
+      ],
+      "id": "0c39f344-a265-4414-9822-e6654b01039b",
+      "name": "If_2"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.lead_email }}",
+        "subject": "Following up on your inquiry",
+        "message": "=<p>Hi {{ $json.lead_name }},</p> <p>Thanks for reaching out! We've received your message and a member of our team will review it shortly.</p> <p>If you're interested in seeing our platform in action, feel free to book a demo slot that works for you: [Link to your Calendly/Scheduling Tool]</p> <p>Best regards,<br>The Analytos Team</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        128
+      ],
+      "id": "19875808-f334-4afe-ac8f-522b9241976f",
+      "name": "Send a message",
+      "webhookId": "27314aab-9e9e-491b-9ed4-ea2c0f7d2d75",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SUKxASgxHZqhGH60",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        -96
+      ],
+      "id": "aa749565-7f78-4363-bccf-c6e820c22bfb",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14ymZdX4HDIfePbhpQXtx1o-VL8yGoy3-TMecNx0z-Io",
+          "mode": "list",
+          "cachedResultName": "MasterSheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14ymZdX4HDIfePbhpQXtx1o-VL8yGoy3-TMecNx0z-Io/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14ymZdX4HDIfePbhpQXtx1o-VL8yGoy3-TMecNx0z-Io/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Company": "={{ $json.Company }}",
+            "Message": "={{ $json.Message }}",
+            "Category": "={{ $json.Category }}",
+            "Confidence": "={{ $json.Confidence }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confidence",
+              "displayName": "Confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1328,
+        -96
+      ],
+      "id": "2840c90c-f00b-42ad-9bb8-8521f12cc952",
+      "name": "Append row in sheet1",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "v7VXnKnD6PI4anrv",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09MAN6E6HJ",
+          "mode": "list",
+          "cachedResultName": "sales"
+        },
+        "text": "=🚀 New Lead Alert! 🚀  *Name*: {{ $json.Name }}  *Email*{{ $json.Email }}:  *Company*:{{ $json.Company }}   *Intent Category*: {{ $json.Category }}** (Confidence:{{ $json.Confidence }}   *Message*: > {{ $json.Message }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1536,
+        -96
+      ],
+      "id": "d5e52118-8830-4daa-a540-b3b665538bf7",
+      "name": "Send a message1",
+      "webhookId": "1888fda8-c2f3-4d56-805b-c10d9bed6fd2",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "Sim3QvQSq8oPbTI5",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ],
+    "Merge": [
+      {
+        "json": {
+          "headers": {
+            "host": "adivikramsfield.app.n8n.cloud",
+            "user-agent": "PostmanRuntime/7.49.0",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cache-control": "no-cache",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "54.86.50.139",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "98ffdf6c8073fbd0-IAD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "postman-token": "9292bb07-2702-483f-9d00-735c80c6c4ee",
+            "x-forwarded-for": "54.86.50.139, 104.23.211.70",
+            "x-forwarded-host": "adivikramsfield.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-39-c65d8f959-7n2hn",
+            "x-is-trusted": "yes",
+            "x-real-ip": "54.86.50.139"
+          },
+          "params": {},
+          "query": {
+            "name": "Test Lead",
+            "email": "test@example.com",
+            "company": "Test Co.",
+            "message": "I am very interested in your pricing."
+          },
+          "body": {},
+          "webhookUrl": "https://adivikramsfield.app.n8n.cloud/webhook-test/Lead-Test",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "Edit Fields": [
+      {
+        "json": {
+          "lead_name": "Test Lead",
+          "lead_email": "test@example.com",
+          "lead_company": "Test Co.",
+          "lead_message": "I am very interested in your pricing."
+        }
+      }
+    ],
+    "Append row in sheet": [
+      {
+        "json": {
+          "Name": "Test Lead",
+          "Email": "test@example.com",
+          "Company": "Test Co.",
+          "Message": "I am very interested in your pricing.",
+          "Category": "High Intent",
+          "Confidence": 0.95
+        }
+      }
+    ],
+    "Mock Subflow Output": [
+      {
+        "json": {
+          "lead_name": "Test Lead",
+          "lead_email": "test@example.com",
+          "lead_company": "Test Co.",
+          "lead_message": "I am very interested in your pricing.",
+          "data1": {
+            "category": "Medium Intent",
+            "confidence": 0.85
+          }
+        }
+      }
+    ],
+    "Send a message": [
+      {
+        "json": {
+          "id": "199f3d70bbe97867",
+          "threadId": "199f3d70bbe97867",
+          "labelIds": [
+            "SENT"
+          ]
+        }
+      }
+    ],
+    "Append row in sheet1": [
+      {
+        "json": {
+          "Name": "Test Lead",
+          "Email": "test@example.com",
+          "Company": "Test Co.",
+          "Message": "I am very interested in your pricing.",
+          "Category": "High Intent",
+          "Confidence": 0.95
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "adivikramsfield.app.n8n.cloud",
+            "user-agent": "PostmanRuntime/7.49.0",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cache-control": "no-cache",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "54.86.50.139",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9902ecfa273520ac-IAD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "postman-token": "29b295dc-aac6-4d65-8003-46395d68a950",
+            "x-forwarded-for": "54.86.50.139, 172.71.222.72",
+            "x-forwarded-host": "adivikramsfield.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-39-c65d8f959-xj9qw",
+            "x-is-trusted": "yes",
+            "x-real-ip": "54.86.50.139"
+          },
+          "params": {},
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://adivikramsfield.app.n8n.cloud/webhook-test/Lead-Test",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Mock Subflow Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Subflow Output": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If_2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If_2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "29965d62-62be-46bc-9261-b091719a587b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4807366e20c00478c12074d6d005f5dfeed8bceabb964c60e8ba44b61fa879ed"
+  },
+  "id": "mrMwXE8u20VRhfVO",
+  "tags": []
+}

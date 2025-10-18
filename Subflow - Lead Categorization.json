@@ -1,0 +1,91 @@
+{
+  "name": "Subflow - Lead Categorization",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro-preview-03-25",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro-preview-03-25"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the following lead message and classify its intent. Your response MUST be a valid JSON object with two keys: \"category\" and \"confidence\".\n\nThe \"category\" must be one of these three exact strings: \"High Intent\", \"Medium Intent\", or \"Low Intent\".\n- \"High Intent\" for messages that are ready to buy, ask for pricing, or want a quote now.\n- \"Medium Intent\" for messages asking for more information, features, or a demo.\n- \"Low Intent\" for spam, job applications, or general inquiries not related to a purchase.\n\nThe \"confidence\" must be a number between 0.0 and 1.0 representing your certainty.\n\nHere is the message:\n{{ $json.message }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "24476fd0-b119-415b-b483-62b219f2df8b",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "kyxf4qcc3NikPCJz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "5fc07328-21a4-4a30-9417-be5d0ce248b2",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {
+    "Message a model": [
+      {
+        "json": {
+          "category": "High Intent",
+          "confidence": 0.95
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d2c799e1-af96-49cf-ad5b-e3952108d06d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4807366e20c00478c12074d6d005f5dfeed8bceabb964c60e8ba44b61fa879ed"
+  },
+  "id": "RjZvS6STQxj81bRG",
+  "tags": []
+}
